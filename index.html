@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Financial Literacy Game</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; }
+    .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+    .wallet { font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💰 Financial Literacy Game 💰</h1>
+    <div id="startScreen">
+      <input type="text" id="playerName" placeholder="Enter your name">
+      <button onclick="startGame()">Start Game</button>
+    </div>
+    <div id="gameScreen" style="display:none;">
+      <p id="question"></p>
+      <div id="options"></div>
+      <p class="wallet" id="wallet">Wallet: 0 coins</p>
+      <button onclick="openStore()">🛒 Store</button>
+    </div>
+    <div id="storeScreen" style="display:none;">
+      <h3>Store</h3>
+      <div id="storeItems"></div>
+      <button onclick="closeStore()">Close Store</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {q: "If you earn $200 and save 25%, how much do you save?", options: ["$25", "$50", "$75"], answer: "$50"},
+      {q: "Which is an asset?", options: ["Credit card debt", "House", "Car loan"], answer: "House"},
+      {q: "If you invest $100 at 10% interest, how much after 1 year?", options: ["$105", "$110", "$120"], answer: "$110"}
+    ];
+
+    const storeItems = { "Piggy Bank": 30, "Budget Planner": 50, "Investment Guide": 80 };
+
+    let wallet = 0, score = 0, currentQ = 0, playerName = "";
+
+    function startGame() {
+      playerName = document.getElementById("playerName").value.trim();
+      if (!playerName) { alert("Please enter your name."); return; }
+      document.getElementById("startScreen").style.display = "none";
+      document.getElementById("gameScreen").style.display = "block";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      document.getElementById("question").innerText = questions[currentQ].q;
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+      questions[currentQ].options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt);
+        optionsDiv.appendChild(btn);
+      });
+      document.getElementById("wallet").innerText = `Wallet: ${wallet} coins`;
+    }
+
+    function checkAnswer(selected) {
+      if (selected === questions[currentQ].answer) {
+        score += 10;
+        wallet += 10;
+        alert(`Correct! Earned 10 coins. Wallet: ${wallet}`);
+      } else {
+        alert(`Wrong! Wallet: ${wallet}`);
+      }
+      currentQ++;
+      if (currentQ < questions.length) {
+        loadQuestion();
+      } else {
+        endGame();
+      }
+    }
+
+    function openStore() {
+      document.getElementById("storeScreen").style.display = "block";
+      const storeDiv = document.getElementById("storeItems");
+      storeDiv.innerHTML = "";
+      for (let item in storeItems) {
+        const btn = document.createElement("button");
+        btn.innerText = `${item} - ${storeItems[item]} coins`;
+        btn.onclick = () => buyItem(item, storeItems[item]);
+        storeDiv.appendChild(btn
